@@ -1,0 +1,43 @@
+version 2.1
+
+executors:
+  terraform:
+    docker: 
+      - image: hashicorp/terraform:1.6.3
+    working_directory: ~/project
+
+
+jobs:
+  terraform-plan:
+    executor: terraform
+    steps:
+      - checkout
+      - run:
+          name: Terraform Init
+          command: terraform init
+      - run:
+          name: Terraform Plan 
+          command: terraform plan -var="bucket_name=infra-drawn-static" -input=false -out=tfplan
+
+  terraform-apply:
+    executor: terraform
+    steps:
+      - checkout
+      - run:
+          name: Terraform Init
+          command: terraform init
+      - run:
+          name: Terraform Apply 
+          command: terraform apply -auto-approve -var="bucket_name=infra-drawn-static"
+
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - terraform-plan
+      - terraform-apply:
+          requires:
+            - terraform-plan
+          filters:
+            branches:
+              only: main
