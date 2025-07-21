@@ -1,0 +1,13 @@
+# Terraform files
+*.tfstate
+*.tfstate.backup
+.terraform/
+terraform.tfvars
+*.tfvars
+
+
+# Node 
+node_modules/
+dist/
+
+.DS_Store
