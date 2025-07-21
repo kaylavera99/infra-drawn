@@ -4,7 +4,7 @@ executors:
   terraform:
     docker:
       - image: hashicorp/terraform:1.6.3
-    working_directory: ~/project/terraform
+    working_directory: ~/infra-drawn/terraform
 
 jobs:
   terraform-plan:
