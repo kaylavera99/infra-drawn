@@ -8,9 +8,23 @@ terraform.tfvars
 
 # Node 
 node_modules/
-dist/
+**/node_modules/
+npm-debug.log*
+**/dist/
 
 .DS_Store
 
 # Server and environment variables
-server/.env
+services/api/.env
+services/api/node_modules
+.env
+**/.envapps/web/.env.local
+**/.envapps/web/.env.development.local
+!infra/terraform/envs/main/site/.gitkeep
+
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

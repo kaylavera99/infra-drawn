@@ -1,42 +1,80 @@
 version: 2.1
 
+parameters:
+  run_apply:
+    type: boolean
+    default: false
+
 executors:
+  node:
+    docker:
+      - image: cimg/node:20.12
+    working_directory: ~/project
   terraform:
     docker:
       - image: hashicorp/terraform:1.6.3
-    working_directory: ~/project/terraform
+    working_directory: ~/project
 
 jobs:
+  build-web:
+    executor: node
+    steps:
+      - checkout
+      - run: npm ci
+      - run: npm run build:web
+      - persist_to_workspace:
+          root: .
+          paths:
+            - apps/web/dist
+
+
   terraform-plan:
     executor: terraform
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - run:
-          name: Terraform Init
-          command: terraform -chdir=terraform init
+          name: stage site/ from dist/
+          command: |
+            mkdir -p infra/terraform/envs/main/site
+            rm -rf infra/terraform/envs/main/site/*
+            cp -r apps/web/dist/* infra/terraform/envs/main/site/
       - run:
-          name: Terraform Plan
-          command: terraform -chdir=terraform plan -var="bucket_name=infra-drawn-static" -input=false -out=tfplan
+          name: Terraform init
+          command: terraform -chdir=infra/terraform/envs/main init
+      - run:
+          name: Terraform plan
+          command: terraform -chdir=infra/terraform/envs/main plan -input=false -no-color
 
   terraform-apply:
     executor: terraform
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - run:
-          name: Terraform Init
-          command: terraform -chdir=terraform init
+          name: stage site/ from dist/
+          command: |
+            mkdir -p infra/terraform/envs/main/site
+            rm -rf infra/terraform/envs/main/site/*
+            cp -r apps/web/dist/* infra/terraform/envs/main/site/
+      - run:
+          name: Terraform init
+          command: terraform -chdir=infra/terraform/envs/main init
       - run:
           name: Terraform Apply
-          command: terraform -chdir=terraform apply -auto-approve -var="bucket_name=infra-drawn-static"
+          command: terraform -chdir=infra/terraform/envs/main apply -auto-approve
 
 workflows:
-  version: 2
   deploy:
     jobs:
-      - terraform-plan
+      - build-web:
+          filters: { branches: { only: main } }
+      - terraform-plan:
+          requires: [build-web]
+          filters: { branches: { only: main } }
       - terraform-apply:
-          requires:
-            - terraform-plan
-          filters:
-            branches:
-              only: main
+          requires: [terraform-plan]
+          filters: { branches: { only: main } }
+

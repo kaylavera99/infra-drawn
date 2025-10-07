@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { OpenAI } from 'openai';
+import  OpenAI  from 'openai';
 
 dotenv.config();
 
@@ -22,7 +22,7 @@ Respond ONLY with a valid Mermaid diagram inside a \`\`\`mermaid code block.
 
 Generate a Mermaid ${diagramType} diagram for the following input:
 ${prompt}
-`;
+`.trim();
 
   try {
     const completion = await openai.chat.completions.create({
