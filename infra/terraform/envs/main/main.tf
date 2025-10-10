@@ -1,5 +1,11 @@
 terraform {
     required_version = ">=1.6.0"
+    required_providers {
+        archive = {
+            source = "hashicorp/archive"
+            version ="~>2.5"
+        }
+    }
 }
 
 provider "aws" {
@@ -99,4 +105,69 @@ resource "aws_s3_object" "assets" {
         lookup(local.mime, element(regexall("\\.([^.]+)$", each.key), 0)[0]),
         null
     )
+}
+
+
+# -- lambda role
+
+resource "aws_iam_role" "lambda_exec" {
+    name = "infra-drawn-lambda-exec-${var.env}"
+    assume_role_policy = jsonencode({
+        Version = "2012-10-17",
+        Statement = [{
+            Effect = "Allow",
+            Principal = { Service = "lambda.amazonaws.com"},
+            Action = "sts:AssumeRole"
+        }]
+    })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logs" {
+    role = aws_iam_role.lambda_exec.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# -- Zip handler
+data "archive_file" "api_zip" {
+    type = "zip"
+    source_file = abspath("${path.module}/../../../../services/api/lambda.mjs")
+    output_path = "${path.module}/api.zip"
+
+}
+
+# -- lambda function
+
+resource "aws_lambda_function" "generate" {
+    function_name = "infra-drawn-generate-${var.env}"
+    role = aws_iam_role.lambda_exec.arn
+    runtime = "nodejs20.x"
+    handler = "lambda.handler"
+
+    filename = data.archive_file.api_zip.output_path
+    source_code_hash = data.archive_file.api_zip.output_base64sha256
+
+    environment {
+        variables = {
+            OPENAI_API_KEY = var.openai_api_key
+        }
+    }
+
+    tags = { Project = "infra-drawn", Env = var.env}
+}
+
+# -- public facing https url for lambda
+resource "aws_lambda_function_url" "generate" {
+    function_name = aws_lambda_function.generate.function_name
+    authorization_type = "NONE"
+
+    cors {
+        allow_origins = ["*"]
+        allow_methods = ["POST"]
+        allow_headers = ["content-type"]
+    }
+
+}
+
+output "api_url" {
+    value = aws_lambda_function_url.generate.function_url
 }

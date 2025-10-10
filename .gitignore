@@ -18,9 +18,14 @@ npm-debug.log*
 services/api/.env
 services/api/node_modules
 .env
+**/.envapps/api/.env
+**/.env
+
 **/.envapps/web/.env.local
 **/.envapps/web/.env.development.local
+infra/terraform/envs/main/site/**
 !infra/terraform/envs/main/site/.gitkeep
+infra/terraform/envs/main/api.zip
 
 
 .DS_Store
@@ -28,3 +33,5 @@ Thumbs.db
 .vscode/
 .idea/
 *.log
+
+

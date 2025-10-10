@@ -9,3 +9,8 @@ variable "env" {
   type        = string
   default     = "main"
 }
+
+variable "openai_api_key" {
+  type = string
+  sensitive = true
+}
