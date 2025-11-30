@@ -43,7 +43,7 @@ jobs:
       - run:
           name: Terraform init (remote state)
           command: |
-            terraform -chdir=infra/terraform/envs/main init -input=false \
+            terraform -chdir=infra/terraform/envs/main init -reconfigure -input=false \
               -backend-config="bucket=${TF_STATE_BUCKET}" \
               -backend-config="region=${AWS_DEFAULT_REGION}" \
               -backend-config="key=infra-drawm/main/terraform.tfstate" \
@@ -67,7 +67,7 @@ jobs:
       - run:
           name: Terraform init (remote state)
           command: |
-            terraform -chdir=infra/terraform/envs/main init -input=false \
+            terraform -chdir=infra/terraform/envs/main init -reconfigure -input=false \
               -backend-config="bucket=${TF_STATE_BUCKET}" \
               -backend-config="region=${AWS_DEFAULT_REGION}" \
               -backend-config="key=infra-drawm/main/terraform.tfstate" \
