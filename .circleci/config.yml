@@ -73,9 +73,9 @@ jobs:
               -backend-config="key=infra-drawm/main/terraform.tfstate" \
               -backend-config="encrypt=true"
       - run: 
-          name: Terraform debug
+          name: Terraform workspace
           command: |
-            terraform -chdir=infra/terraform/envs/main state list | sed -n '1,120p'
+            terraform -chdir=infra/terraform/envs/main workspace show
             terraform -chdir=infra/terraform/envs/main state list | grep lambda_exec || true
       - run:
           name: Terraform Apply
