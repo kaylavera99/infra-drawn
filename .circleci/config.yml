@@ -46,7 +46,7 @@ jobs:
             terraform -chdir=infra/terraform/envs/main init -reconfigure -input=false \
               -backend-config="bucket=${TF_STATE_BUCKET}" \
               -backend-config="region=${AWS_DEFAULT_REGION}" \
-              -backend-config="key=infra-drawm/main/terraform.tfstate" \
+              -backend-config="key=infra-drawn/main/terraform.tfstate" \
               -backend-config="encrypt=true"
       - run:
           name: Terraform plan
@@ -70,7 +70,7 @@ jobs:
             terraform -chdir=infra/terraform/envs/main init -reconfigure -input=false \
               -backend-config="bucket=${TF_STATE_BUCKET}" \
               -backend-config="region=${AWS_DEFAULT_REGION}" \
-              -backend-config="key=infra-drawm/main/terraform.tfstate" \
+              -backend-config="key=infra-drawn/main/terraform.tfstate" \
               -backend-config="encrypt=true"
       - run: 
           name: Terraform workspace
@@ -82,7 +82,7 @@ jobs:
             terraform -chdir=infra/terraform/envs/main state list | grep lambda_exec || true
       - run:
           name: Terraform Apply
-          command: terraform -chdir=infra/terraform/envs/main apply -auto-approve
+          command: terraform -chdir=infra/terraform/envs/main apply -auto-approve -input=false 
 
 workflows:
   deploy:
