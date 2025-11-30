@@ -1,9 +1,17 @@
 terraform {
     required_version = ">=1.6.0"
     required_providers {
+        aws = {
+            source = "hashicorp/aws"
+            version = "~>5.0"
+        }
         archive = {
             source = "hashicorp/archive"
             version ="~>2.5"
+        }
+        random = {
+            source = "hashicorp/random"
+            version = "~>3.6"
         }
     }
     backend "s3" {}
@@ -13,12 +21,18 @@ provider "aws" {
     region = var.region
 }
 
-data "aws_caller_identity" "me" {}
+data "aws_caller_identity" "current" {}
 
-
+resource "random_id" "bucket_suffix" {
+    byte_length = 3
+    keepers = {
+        account_id = data.aws_caller_identity.current.account_id
+        env = var.env
+    }
+}
 
 locals {
-    bucket_name = "infra-drawn-${var.env}-${data.aws_caller_identity.me.account_id}"
+    bucket_name = "infra-drawn-${var.env}-${data.aws_caller_identity.current.account_id}-${random_id.bucket_suffix}"
 
     site_directory = "${path.module}/site"
 
