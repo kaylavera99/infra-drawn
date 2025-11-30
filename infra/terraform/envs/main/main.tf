@@ -32,7 +32,7 @@ resource "random_id" "bucket_suffix" {
 }
 
 locals {
-    bucket_name = "infra-drawn-${var.env}-${data.aws_caller_identity.current.account_id}-${random_id.bucket_suffix}"
+    bucket_name = "infra-drawn-${var.env}-${data.aws_caller_identity.current.account_id}-${random_id.bucket_suffix.hex}"
 
     site_directory = "${path.module}/site"
 
