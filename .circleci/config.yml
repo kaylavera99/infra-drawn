@@ -41,8 +41,13 @@ jobs:
             rm -rf infra/terraform/envs/main/site/*
             cp -r apps/web/dist/* infra/terraform/envs/main/site/
       - run:
-          name: Terraform init
-          command: terraform -chdir=infra/terraform/envs/main init
+          name: Terraform init (remote state)
+          command: |
+            terraform -chdir=infra/terraform/envs/main init -input=false \
+              -backend-config="bucket=${TF_STATE_BUCKET}" \
+              -backend-config="region=${AWS_DEFAULT_REGION}" \
+              -backend-config="key=infra-drawm/main/terraform.tfstate" \
+              -backend-config="encrypt=true"
       - run:
           name: Terraform plan
           command: terraform -chdir=infra/terraform/envs/main plan -input=false -no-color
@@ -60,8 +65,13 @@ jobs:
             rm -rf infra/terraform/envs/main/site/*
             cp -r apps/web/dist/* infra/terraform/envs/main/site/
       - run:
-          name: Terraform init
-          command: terraform -chdir=infra/terraform/envs/main init
+          name: Terraform init (remote state)
+          command: |
+            terraform -chdir=infra/terraform/envs/main init -input=false \
+              -backend-config="bucket=${TF_STATE_BUCKET}" \
+              -backend-config="region=${AWS_DEFAULT_REGION}" \
+              -backend-config="key=infra-drawm/main/terraform.tfstate" \
+              -backend-config="encrypt=true"
       - run:
           name: Terraform Apply
           command: terraform -chdir=infra/terraform/envs/main apply -auto-approve
