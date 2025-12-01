@@ -1,5 +1,5 @@
 export const handler = async (event) => {
-    const headers = {
+/*     const headers = {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
@@ -12,7 +12,7 @@ export const handler = async (event) => {
             headers,
             body: JSON.stringify({ message: "CORS preflight check." }),
         };
-    }
+    } */
 
     try {
         const { prompt = "", diagramType = "flowchart" } = JSON.parse(event.body || "{}");
@@ -50,14 +50,14 @@ export const handler = async (event) => {
         
         return {
             statusCode: 200,
-            headers,
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ diagram: mermaid }),
         };
     } catch (error) {
         console.error("Error:", error);
         return {
             statusCode: 500,
-            headers,
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ error: "Internal server error." }),
         };
     }
