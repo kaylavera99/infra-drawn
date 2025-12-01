@@ -180,7 +180,7 @@ resource "aws_lambda_function_url" "generate" {
 
     cors {
         allow_origins = ["*"]
-        allow_methods = ["post"]
+        allow_methods = ["POST"]
         allow_headers = ["content-type"]
     }
 
