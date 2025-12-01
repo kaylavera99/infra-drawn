@@ -161,6 +161,9 @@ resource "aws_lambda_function" "generate" {
     filename = data.archive_file.api_zip.output_path
     source_code_hash = data.archive_file.api_zip.output_base64sha256
 
+    timeout = 30
+    memory_size = 512
+
     environment {
         variables = {
             OPENAI_API_KEY = var.openai_api_key
